@@ -21,6 +21,65 @@ public class AsposeTest {
     private Document doc;
 
     @Test
+    public void testIfConditionWithMailMerge() throws Exception {
+
+        // 验证License
+        if (!WordUtils.getLicense()) {
+            return;
+        }
+
+        // 模版地址
+//        String docxPath = "/Users/huabin/Desktop/template.docx";
+//        String docxPath = "/Users/huabin/workspace/playground/工具向/OfficeTemplateTool/word/src/main/resources/doc/template/template-01.docx";
+        String docxPath = "/Users/huabin/Downloads/Mail merge destinations - Fax (1).docx";
+//        String docxPath = "/Users/huabin/workspace/playground/工具向/OfficeTemplateTool/word/src/main/resources/doc/template/附件：理财产品财务报告附注模板_20221118（更新版）.docx";
+
+        // 读取word模板
+        FileInputStream fileInputStream = new FileInputStream(docxPath);
+        this.doc = new Document(fileInputStream);
+
+//        String[] fieldNames = {
+//                "param1"
+//        };
+//
+//        Object[] fieldValues = {
+//                true
+//        };
+
+        String[] fieldNames = new String[]{"RecipientName", "SenderName", "FaxNumber", "PhoneNumber",
+                "Subject", "Body", "Urgent", "ForReview", "PleaseComment", "param1"};
+        Object[] fieldValues = new Object[]{"Josh", "Jenny", "123456789", "", "Hello",
+                "<b>HTML Body Test message 1</b>", true, false, true, true};
+
+        // 处理if...else
+        doc.getMailMerge().execute(fieldNames, fieldValues);
+
+        // 保存到本地
+        doc.save("FinalFile.docx", SaveFormat.DOCX);
+    }
+
+    @Test
+    public void testIfCondition() throws Exception {
+        // 验证License
+        if (!WordUtils.getLicense()) {
+            return;
+        }
+
+        // 模版地址
+        String docxPath = "src/main/resources/doc/template/template-01.docx";
+
+        // 读取word模板
+        FileInputStream fileInputStream = new FileInputStream(docxPath);
+        this.doc = new Document(fileInputStream);
+
+        // 获取单维指标
+        Map<String, String> singleData = this.getSingleData();
+
+        //
+
+    }
+
+    @Test
     public void testAspose() throws Exception {
 
         // 验证License
@@ -29,8 +88,8 @@ public class AsposeTest {
         }
 
         // 模版地址
-//        String docxPath = "src/main/resources/doc/template/template-01.docx";
-        String docxPath = "/Users/huabin/workspace/playground/工具向/OfficeTemplateTool/word/src/main/resources/doc/template/附件：理财产品财务报告附注模板_20221118（更新版）.docx";
+        String docxPath = "src/main/resources/doc/template/template-01.docx";
+//        String docxPath = "/Users/huabin/workspace/playground/工具向/OfficeTemplateTool/word/src/main/resources/doc/template/附件：理财产品财务报告附注模板_20221118（更新版）.docx";
 
         // 读取word模板
         FileInputStream fileInputStream = new FileInputStream(docxPath);
@@ -77,6 +136,8 @@ public class AsposeTest {
         indiListMap.put("single", singleIndicatorList);
         indiListMap.put("multi", multiIndicatorList);
 
+
+
         // 调取外部接口，获取数据
         // 删除最后一张表
         lastTable.remove();
@@ -115,15 +176,16 @@ public class AsposeTest {
         }
 
         // 处理跨页的情况
-        LayoutCollector collector = new LayoutCollector(doc);
-        for (int i = 0; i < allTables.getCount(); i++) {
-            Table table = (Table) allTables.get(i);
-            // 表格存在跨页
-            if (collector.getEndPageIndex(table.getLastRow()) - collector.getStartPageIndex(table.getFirstRow()) > 1) {
-                splitTable(table, collector);
-                doc.updatePageLayout();
-            }
-        }
+//        LayoutCollector collector = new LayoutCollector(doc);
+//        for (int i = 0; i < allTables.getCount(); i++) {
+//            Table table = (Table) allTables.get(i);
+//            // 表格存在跨页
+//            if (collector.getEndPageIndex(table.getLastRow()) - collector.getStartPageIndex(table.getFirstRow()) > 1) {
+//                splitTable(table, collector);
+//                doc.updatePageLayout();
+//            }
+//        }
+
         // 保存到本地
         doc.save("FinalFile.docx", SaveFormat.DOCX);
     }
@@ -276,6 +338,7 @@ public class AsposeTest {
         singleMap.put("D0001", "1234");
         singleMap.put("D0011", "5678");
         singleMap.put("D0012", "换行测试\n行2\n行3");
+        singleMap.put("param1", "1");
         return singleMap;
     }
 
